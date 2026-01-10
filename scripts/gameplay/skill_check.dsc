@@ -120,7 +120,7 @@ skill_check:
 
                     - stop if:<player.has_flag[blockout.skill_check].not>
                     - flag <player> blockout.skill_check.value:<[value]> expire:1s
-                    - title title:<&chr[a001].font[primary_uis]><&translate[key=space.-40].font[space:default]><&chr[a0<[check]>].font[checks]><&translate[key=space.-40].font[space:default]><&chr[a<[value]>].font[skillchecks]> fade_in:0s fade_out:0s stay:2t
+                    - title title:<&chr[a001].font[primary_uis]><&translate[key=space.-40].font[space:default]><&chr[a0<[check]>].font[checks]><&translate[key=space.-40].font[space:default]><&chr[a<[value]>].font[skillchecks]> fade_in:0s fade_out:0s stay:4t
                     - if <[value].mod[<[speed]>]> == 0:
                         - wait 1t
                 - wait 1t

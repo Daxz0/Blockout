@@ -26,7 +26,7 @@ generator_detection:
                 - foreach stop
 
             - define base_speed 1
-            - define base_skill_check_chance 30
+            - define base_skill_check_chance 8
 
             - while <player.has_flag[blockout.generator]>:
                 - if <util.random_chance[<[base_skill_check_chance]>]>:
@@ -89,11 +89,19 @@ update_generator_bar:
         - if <[generator].flag[generator.progress]> < 0:
             - flag <[generator]> generator.progress:0
 
-        - define repairing_ui <&color[#FFFAFA]><&chr[a002].font[primary_uis]><&translate[space.33].font[space:default]>
-        - define fillerChar <&color[#FFFAFA]><&translate[space.-1].font[space:default]><&chr[a003].font[primary_uis]>
+        - define repairing_ui <&chr[a001].font[repair_bar]><&translate[space.33].font[space:default]>
+        - define fillerChar <&translate[space.-1].font[space:default]><&chr[a002].font[repair_bar]>
 
         # - bossbar auto generator_<[generator].uuid> progress:<[generator].flag[generator.progress].div[100]> color:BLUE title:Repairing...<element[ ].repeat[32]> players:<player>
-        - bossbar auto generator_<[generator].uuid> title: players:<player>
+
+        - define fillerAmount <[generator].flag[generator.progress]>
+        - define fillerWidth 26
+        - define totalWidth 214
+        - define defaultFillerPos 0
+        - define defaultFillerBuffer <&translate[space.<[defaultFillerPos]>].font[space:default]>
+        - define fillerCharNew <[fillerChar].repeat[<[fillerAmount]>]>
+
+        - actionbar <&translate[space.<[fillerAmount].mul[2]>].font[space:default]><[repairing_ui]><&translate[space.-<[totalWidth].add[<[fillerWidth]>]>].font[space:default]><[defaultFillerBuffer]><[fillerCharNew]><&translate[space.-<[fillerWidth].add[<[defaultFillerPos]>]>].font[space:default]><&translate[space.<[totalWidth].add[<[fillerWidth]>]>].font[space:default]> players:<player>
 
 exit_generator:
     type: task
@@ -103,7 +111,7 @@ exit_generator:
         - flag <[player].flag[blockout.generator.seat]> seater:!
         - flag <[player].flag[blockout.generator.entity]> generator.workers:--
         - mount <[player]> cancel
-        - bossbar remove generator_<[player].flag[blockout.generator.entity].uuid> players:<[player]>
+        - actionbar " "
 
         - flag <[player]> blockout.generator:!
         - flag <[player]> blockout.skill_check:!
