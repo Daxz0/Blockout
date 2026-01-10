@@ -25,7 +25,7 @@ generator_detection:
                 - flag <[generator]> generator.workers:++
                 - foreach stop
 
-            - define base_speed 1.5
+            - define base_speed 1
             - define base_skill_check_chance 30
 
             - while <player.has_flag[blockout.generator]>:
@@ -48,7 +48,7 @@ generator_detection:
             - else if <context.jump> && <player.has_flag[blockout.skill_check]>:
                 - ratelimit <player> 1s
                 - define data <script[skill_check_points].data_key[check_points].get[<player.flag[blockout.skill_check.check]>]>
-                - define error 4
+                - define error 3
                 - define base_range_min <[data.base.min].sub[<[error]>]>
                 - define base_range_max <[data.base.max].add[<[error]>]>
 
@@ -89,8 +89,11 @@ update_generator_bar:
         - if <[generator].flag[generator.progress]> < 0:
             - flag <[generator]> generator.progress:0
 
+        - define repairing_ui <&color[#FFFAFA]><&chr[a002].font[primary_uis]><&translate[space.33].font[space:default]>
+        - define fillerChar <&color[#FFFAFA]><&translate[space.-1].font[space:default]><&chr[a003].font[primary_uis]>
 
-        - bossbar auto generator_<[generator].uuid> progress:<[generator].flag[generator.progress].div[100]> color:BLUE title:Repairing...<element[ ].repeat[32]> players:<player>
+        # - bossbar auto generator_<[generator].uuid> progress:<[generator].flag[generator.progress].div[100]> color:BLUE title:Repairing...<element[ ].repeat[32]> players:<player>
+        - bossbar auto generator_<[generator].uuid> title: players:<player>
 
 exit_generator:
     type: task
