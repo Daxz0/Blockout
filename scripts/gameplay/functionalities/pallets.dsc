@@ -24,18 +24,21 @@ pallet_handler:
             - define loc <context.entity.location>
 
 
-            - if <context.entity.flag[pallet.used].not>:
+            - if <context.entity.flag[pallet.used].not>  && <player.has_flag[blockout.team.survivor]>:
                 - megstate model:<[pallet_model]> state:start remove
                 - megstate model:<[pallet_model]> state:activate
                 - flag <context.entity> pallet.used:true
 
-                - modifyblock <[loc].find_blocks[air].within[1.5].filter[y.equals[<[loc].y>]]> barrier
+                - define blocks <[loc].find_blocks[air].within[1.5].filter[y.equals[<[loc].y>]]>
+                - modifyblock <[blocks]> barrier
+                - flag <[blocks]> pallet_blocking
 
-
-            - else if <context.entity.flag[pallet.used]> && <context.entity.flag[pallet.broken].not>:
+            - else if <context.entity.flag[pallet.used]> && <context.entity.flag[pallet.broken].not> && <player.has_flag[blockout.team.killer]>:
                 - if <context.entity.flag[pallet.damage]> >= 3:
                     - megstate model:<[pallet_model]> state:break
-                    - modifyblock <[loc].find_blocks[barrier].within[5]> air
+                    - define blocks <[loc].find_blocks[barrier].within[2]>
+                    - modifyblock <[blocks]> air
+                    - flag <[blocks]> pallet_blocking:!
                     - flag <context.entity> pallet.broken:true
                 - else:
                     - megstate model:<[pallet_model]> state:kick
