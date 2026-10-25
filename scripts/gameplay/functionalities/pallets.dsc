@@ -8,7 +8,7 @@ summon_pallet:
         - bmmodel entity:<entry[pallet].spawned_entity> model:pallet
         - flag <entry[pallet].spawned_entity> pallet.damage:0
         - wait 1t
-        - bmstate entity:<entry[pallet].spawned_entity> model:<entry[pallet].spawned_entity.modeled_entity.model> state:start
+        - bmstate entity:<entry[pallet].spawned_entity> model:pallet state:start loop:hold
         - flag <entry[pallet].spawned_entity> facing_right_location:<[loc].yaw.add[90]>
 
 
@@ -19,13 +19,13 @@ pallet_handler:
     events:
         on player right clicks entity_flagged:pallet:
             - ratelimit <player> 1s
-            - define pallet_model <context.entity.modeled_entity.model>
+            - define pallet_model pallet
             - define loc <context.entity.location>
 
 
             - if <context.entity.has_flag[pallet.used].not> && <player.has_flag[blockout.team.survivor]>:
                 - bmstate model:<[pallet_model]> state:start remove
-                - bmstate entity:<context.entity> model:<[pallet_model]> state:activate
+                - bmstate entity:<context.entity> model:<[pallet_model]> state:activate loop:hold
 
                 - define blocks <[loc].find_blocks[air].within[1.5].filter[y.equals[<[loc].y>]]>
                 - modifyblock <[blocks]> barrier

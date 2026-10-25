@@ -1,4 +1,4 @@
-blockout_piglin_ghost:
+blockout_piglin_killer:
     type: task
     debug: false
     script:
@@ -34,3 +34,11 @@ blockout_piglin_ghost:
 
 # plants flag on downed survivor and hooks them
 # charges using tusks
+
+
+blockout_piglin_disguise:
+    type: task
+    debug: false
+    script:
+        - bmmodel entity:<player> model:piglin_killer
+        - adjust <player.bm_entity.model.bone[head]> visible:false

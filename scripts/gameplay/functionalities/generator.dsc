@@ -81,7 +81,7 @@ update_generator_bar:
         - flag <[generator]> generator.progress:+:<[amount]>
         - if <[generator].flag[generator.progress]> >= 100:
             - flag <[generator]> status.completed
-            - bmstate entity:<[generator]> state:active model:<[generator].modeled_entity.model>
+            - bmstate entity:<[generator]> state:active model:generator_temp
             - foreach <[generator].flag[seats]> as:data:
                 - if <[data.seat].has_flag[seater]>:
                     - run exit_generator def:<[data.seat].flag[seater]>
@@ -124,7 +124,7 @@ generator_fail:
         - define generator <player.flag[blockout.generator.entity].if_null[0]>
         - run update_generator_bar def:-<[generator].flag[generator.progress].mul[0.1].round>|<[generator]>
         - wait 2t
-        - bmstate entity:<[generator]> model:<[generator].modeled_entity.model> state:fail
+        - bmstate entity:<[generator]> model:generator_temp state:fail
         - flag <[generator]> status.disabled expire:3s
         - foreach <[generator].flag[seats]> as:data:
             - if <[data.seat].has_flag[seater]>:
