@@ -12,8 +12,8 @@ team_switch:
     script:
         - choose <context.args.first>:
             - case s:
-                - flag <player> blockout.teams.survivor
+                - flag <player> blockout.team.survivor
                 - narrate "<&a>team set to survivor"
             - case k:
-                - flag <player> blockout.teams.killer
+                - flag <player> blockout.team.killer
                 - narrate "<&4>team set to killer"

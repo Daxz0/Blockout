@@ -6,11 +6,10 @@ summon_pallet:
         - define loc <player.location.backward_flat[0.7]>
         - spawn item_display[item=air] <[loc]> save:pallet
         - megmodel entity:<entry[pallet].spawned_entity> model:pallet
-        - flag <entry[pallet].spawned_entity> pallet.used:false
-        - flag <entry[pallet].spawned_entity> pallet.broken:false
         - flag <entry[pallet].spawned_entity> pallet.damage:0
         - wait 1t
         - megstate model:<entry[pallet].spawned_entity.modeled_entity.model> state:start
+        - flag <entry[pallet].spawned_entity> facing_right_location:<[loc].yaw.add[90]>
 
 
 
@@ -24,22 +23,23 @@ pallet_handler:
             - define loc <context.entity.location>
 
 
-            - if <context.entity.flag[pallet.used].not>  && <player.has_flag[blockout.team.survivor]>:
+            - if <context.entity.has_flag[pallet.used].not> && <player.has_flag[blockout.team.survivor]>:
                 - megstate model:<[pallet_model]> state:start remove
                 - megstate model:<[pallet_model]> state:activate
-                - flag <context.entity> pallet.used:true
 
                 - define blocks <[loc].find_blocks[air].within[1.5].filter[y.equals[<[loc].y>]]>
                 - modifyblock <[blocks]> barrier
                 - flag <[blocks]> pallet_blocking
+                - wait 1t
+                - flag <context.entity> pallet.used
 
-            - else if <context.entity.flag[pallet.used]> && <context.entity.flag[pallet.broken].not> && <player.has_flag[blockout.team.killer]>:
+            - else if <context.entity.has_flag[pallet.used]> && <context.entity.has_flag[pallet.broken].not> && <player.has_flag[blockout.team.killer]>:
                 - if <context.entity.flag[pallet.damage]> >= 3:
                     - megstate model:<[pallet_model]> state:break
                     - define blocks <[loc].find_blocks[barrier].within[2]>
                     - modifyblock <[blocks]> air
                     - flag <[blocks]> pallet_blocking:!
-                    - flag <context.entity> pallet.broken:true
+                    - flag <context.entity> pallet.broken
                 - else:
                     - megstate model:<[pallet_model]> state:kick
                     - flag <context.entity> pallet.damage:++
