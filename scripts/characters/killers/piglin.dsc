@@ -27,3 +27,10 @@ blockout_piglin_ghost:
             # how much slow the killer recieves for attacking
             # base of 2 seconds, subtracts 0.05 every stat
             resiliance: 7
+
+
+
+## abilities
+
+# plants flag on downed survivor and hooks them
+# charges using tusks

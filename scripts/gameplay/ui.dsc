@@ -6,23 +6,22 @@ general_ui:
     script:
 
         - define health 2
-        - invoke player.setHealth(health)
 
-        # - while <player.is_online>:
+        - while <player.is_online>:
 
-        # - define generator_count 5
-        # - bossbar auto general_ui_<player.uuid> title:<element[<&lt>color:#aaaabc<&gt><&lt>bold<&gt><[generator_count]><&lt>color:#fffcfc<&gt><element[ ].repeat[2]><&lt>!shadow<&gt><&lt>font:primary_uis<&gt><&chr[a002]><&lt>/font<&gt>].parse_minimessage>
+            - define generator_count 5
+            - bossbar auto general_ui_<player.uuid>_1 title:<element[<&lt>color:#aaaabc<&gt><&lt>bold<&gt><[generator_count]><&lt>color:#fffcfc<&gt><element[ ].repeat[2]><&lt>!shadow<&gt><&lt>font:primary_uis<&gt><&chr[a002]><&lt>/font<&gt>].parse_minimessage>
 
-        # - sidebar title:logo
-
-
-        # - define fake_player_list_for_testing <list[Daxz_|heypr|Notch|Bob]>
-        # - foreach <[fake_player_list_for_testing]> as:player:
-        #     - sidebar set_line scores:<[loop_index]> "values:<element[<&lt>head:<[player]>:true<&gt>].parse_minimessage>"
+            - bossbar auto general_ui_<player.uuid>_2 title:<&color[#aaaabc]><element[ ].repeat[20].strikethrough>
 
 
+            # - define fake_player_list_for_testing <list[Daxz_|heypr|Notch|Bob]>
+            # - foreach <[fake_player_list_for_testing]> as:player:
+            #     - sidebar set_line scores:<[loop_index]> "values:<element[<&lt>head:<[player]>:true<&gt>].parse_minimessage>"
 
-        # - wait 3t
+
+
+            - wait 3t
 
 
 ability_display_test:
@@ -30,7 +29,7 @@ ability_display_test:
     debug: false
     script:
         # - while <player.is_online>:
-            - bossbar <element[<&lt>color:#fffcfc<&gt><&lt>!shadow<&gt><&lt>font:killer_abilities<&gt><&chr[a001]><&chr[a002]><&lt>/font<&gt><element[ ].repeat[10]>4].parse_minimessage>
+            - bossbar ability_ui_<player.uuid> <element[<&lt>color:#fffcfc<&gt><&lt>!shadow<&gt><&lt>font:killer_abilities<&gt><&chr[a001]><&chr[a002]><&lt>/font<&gt><element[ ].repeat[10]>4].parse_minimessage>
 
             # please paper just let me hide shadows
 

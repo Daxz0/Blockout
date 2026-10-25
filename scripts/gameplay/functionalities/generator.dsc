@@ -81,7 +81,7 @@ update_generator_bar:
         - flag <[generator]> generator.progress:+:<[amount]>
         - if <[generator].flag[generator.progress]> >= 100:
             - flag <[generator]> status.completed
-            - megstate state:active model:<[generator].modeled_entity.model>
+            - bmstate entity:<[generator]> state:active model:<[generator].modeled_entity.model>
             - foreach <[generator].flag[seats]> as:data:
                 - if <[data.seat].has_flag[seater]>:
                     - run exit_generator def:<[data.seat].flag[seater]>
@@ -92,7 +92,7 @@ update_generator_bar:
         - define repairing_ui <&chr[a001].font[repair_bar]><&translate[space.33].font[space:default]>
         - define fillerChar <&translate[space.-1].font[space:default]><&chr[a002].font[repair_bar]>
 
-        # - bossbar auto generator_<[generator].uuid> progress:<[generator].flag[generator.progress].div[100]> color:BLUE title:Repairing...<element[ ].repeat[32]> players:<player>
+        # - bossbar auto generator_<[generator].uuid> progress:<[generator].flag[generator.progress].div[100]> color:BLUE title:Repairing...<element[ ].repeat[32]> targets:<player>
 
         - define fillerAmount <[generator].flag[generator.progress]>
         - define fillerWidth 26
@@ -101,7 +101,7 @@ update_generator_bar:
         - define defaultFillerBuffer <&translate[space.<[defaultFillerPos]>].font[space:default]>
         - define fillerCharNew <[fillerChar].repeat[<[fillerAmount]>]>
 
-        - actionbar <&translate[space.<[fillerAmount].mul[2]>].font[space:default]><[repairing_ui]><&translate[space.-<[totalWidth].add[<[fillerWidth]>]>].font[space:default]><[defaultFillerBuffer]><[fillerCharNew]><&translate[space.-<[fillerWidth].add[<[defaultFillerPos]>]>].font[space:default]><&translate[space.<[totalWidth].add[<[fillerWidth]>]>].font[space:default]> players:<player>
+        - actionbar <&translate[space.<[fillerAmount].mul[2]>].font[space:default]><[repairing_ui]><&translate[space.-<[totalWidth].add[<[fillerWidth]>]>].font[space:default]><[defaultFillerBuffer]><[fillerCharNew]><&translate[space.-<[fillerWidth].add[<[defaultFillerPos]>]>].font[space:default]><&translate[space.<[totalWidth].add[<[fillerWidth]>]>].font[space:default]> targets:<player>
 
 exit_generator:
     type: task
@@ -124,7 +124,7 @@ generator_fail:
         - define generator <player.flag[blockout.generator.entity].if_null[0]>
         - run update_generator_bar def:-<[generator].flag[generator.progress].mul[0.1].round>|<[generator]>
         - wait 2t
-        - megstate model:<[generator].modeled_entity.model> state:fail
+        - bmstate entity:<[generator]> model:<[generator].modeled_entity.model> state:fail
         - flag <[generator]> status.disabled expire:3s
         - foreach <[generator].flag[seats]> as:data:
             - if <[data.seat].has_flag[seater]>:
@@ -144,7 +144,7 @@ summon_generator:
     script:
         - define loc <player.location>
         - spawn item_display[item=air] <[loc]> save:gen
-        - megmodel entity:<entry[gen].spawned_entity> model:generator_temp
+        - bmmodel entity:<entry[gen].spawned_entity> model:generator_temp
         - flag <entry[gen].spawned_entity> generator.progress:0
         - flag <entry[gen].spawned_entity> generator.workers:0
 

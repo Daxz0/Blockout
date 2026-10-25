@@ -5,10 +5,10 @@ summon_pallet:
     script:
         - define loc <player.location.backward_flat[0.7]>
         - spawn item_display[item=air] <[loc]> save:pallet
-        - megmodel entity:<entry[pallet].spawned_entity> model:pallet
+        - bmmodel entity:<entry[pallet].spawned_entity> model:pallet
         - flag <entry[pallet].spawned_entity> pallet.damage:0
         - wait 1t
-        - megstate model:<entry[pallet].spawned_entity.modeled_entity.model> state:start
+        - bmstate entity:<entry[pallet].spawned_entity> model:<entry[pallet].spawned_entity.modeled_entity.model> state:start
         - flag <entry[pallet].spawned_entity> facing_right_location:<[loc].yaw.add[90]>
 
 
@@ -24,8 +24,8 @@ pallet_handler:
 
 
             - if <context.entity.has_flag[pallet.used].not> && <player.has_flag[blockout.team.survivor]>:
-                - megstate model:<[pallet_model]> state:start remove
-                - megstate model:<[pallet_model]> state:activate
+                - bmstate model:<[pallet_model]> state:start remove
+                - bmstate entity:<context.entity> model:<[pallet_model]> state:activate
 
                 - define blocks <[loc].find_blocks[air].within[1.5].filter[y.equals[<[loc].y>]]>
                 - modifyblock <[blocks]> barrier
@@ -35,13 +35,13 @@ pallet_handler:
 
             - else if <context.entity.has_flag[pallet.used]> && <context.entity.has_flag[pallet.broken].not> && <player.has_flag[blockout.team.killer]>:
                 - if <context.entity.flag[pallet.damage]> >= 3:
-                    - megstate model:<[pallet_model]> state:break
+                    - bmstate <context.entity> model:<[pallet_model]> state:break
                     - define blocks <[loc].find_blocks[barrier].within[2]>
                     - modifyblock <[blocks]> air
                     - flag <[blocks]> pallet_blocking:!
                     - flag <context.entity> pallet.broken
                 - else:
-                    - megstate model:<[pallet_model]> state:kick
+                    - bmstate <context.entity> model:<[pallet_model]> state:kick
                     - flag <context.entity> pallet.damage:++
 
 
