@@ -4,7 +4,33 @@ generator_detection:
     type: world
     debug: false
     events:
+        on player right clicks flagged:blockout.team.killer entity_flagged:generator:
+            - define generator <context.entity>
+            - ratelimit <player> 10t
+            - stop if:<player.location.distance[<[generator].location>].is_more_than[2]>
+            - stop if:<[generator].has_flag[status.disabled]>
+            - foreach <[generator].flag[seats]> as:data:
+                - if <[data.seat].has_flag[seater]>:
+                    - stop
+
+            - bmstate entity:<player> model:<player.bm_entity.model.name> state:kick
+            - cast slow amplifier:255 no_icon hide_particles d:1.25s
+            - wait 1.25s
+
+            - run update_generator_bar def:-<[generator].flag[generator.progress].mul[0.15].round>|<[generator]>
+            - wait 2t
+            - bmstate entity:<[generator]> model:generator_temp state:fail
+            - flag <[generator]> status.disabled expire:3s
+            - playeffect effect:explosion <[generator].location.above[0.5]> quantity:1 offset:0
+            - playsound sound:entity.generic.explode <[generator].location>
+            - playeffect effect:campfire_cosy_smoke <[generator].location.above[0.8]> quantity:50
+            - wait 0.3s
+            - playeffect effect:flame <[generator].location.above[0.8]> quantity:50 velocity:0,0.1,0 offset:3
+            - playeffect effect:smoke <[generator].location.above[0.8]> quantity:50
+
+
         on player right clicks flagged:!blockout.generator entity_flagged:generator:
+            - stop if:<player.has_flag[blockout.team.killer]>
             - define generator <context.entity>
             - stop if:<[generator].has_flag[status.disabled]>
             - stop if:<[generator].has_flag[status.completed]>
@@ -94,6 +120,7 @@ update_generator_bar:
 
         # - bossbar auto generator_<[generator].uuid> progress:<[generator].flag[generator.progress].div[100]> color:BLUE title:Repairing...<element[ ].repeat[32]> targets:<player>
 
+        - stop if:<player.has_flag[blockout.team.killer]>
         - define fillerAmount <[generator].flag[generator.progress]>
         - define fillerWidth 26
         - define totalWidth 214
