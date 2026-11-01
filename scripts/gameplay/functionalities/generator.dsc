@@ -4,6 +4,7 @@ generator_detection:
     type: world
     debug: false
     events:
+        # killer interaction
         on player right clicks flagged:blockout.team.killer entity_flagged:generator:
             - define generator <context.entity>
             - ratelimit <player> 10t
@@ -14,13 +15,15 @@ generator_detection:
                     - stop
 
             - bmstate entity:<player> model:<player.bm_entity.model.name> state:kick
-            - cast slow amplifier:255 no_icon hide_particles d:1.25s
-            - wait 1.25s
+            - cast slow amplifier:255 no_icon hide_particles d:2s
+            - wait 1s
+            - bmstate entity:<[generator]> model:generator_temp state:kick
+            - wait 1s
 
             - run update_generator_bar def:-<[generator].flag[generator.progress].mul[0.15].round>|<[generator]>
             - wait 2t
-            - bmstate entity:<[generator]> model:generator_temp state:fail
-            - flag <[generator]> status.disabled expire:3s
+            - bmstate entity:<[generator]> model:generator_temp state:kick
+            - flag <[generator]> status.disabled expire:4s
             - playeffect effect:explosion <[generator].location.above[0.5]> quantity:1 offset:0
             - playsound sound:entity.generic.explode <[generator].location>
             - playeffect effect:campfire_cosy_smoke <[generator].location.above[0.8]> quantity:50
@@ -28,7 +31,7 @@ generator_detection:
             - playeffect effect:flame <[generator].location.above[0.8]> quantity:50 velocity:0,0.1,0 offset:3
             - playeffect effect:smoke <[generator].location.above[0.8]> quantity:50
 
-
+        # survivor interaction
         on player right clicks flagged:!blockout.generator entity_flagged:generator:
             - stop if:<player.has_flag[blockout.team.killer]>
             - define generator <context.entity>
@@ -152,7 +155,7 @@ generator_fail:
         - run update_generator_bar def:-<[generator].flag[generator.progress].mul[0.1].round>|<[generator]>
         - wait 2t
         - bmstate entity:<[generator]> model:generator_temp state:fail
-        - flag <[generator]> status.disabled expire:3s
+        - flag <[generator]> status.disabled expire:5s
         - foreach <[generator].flag[seats]> as:data:
             - if <[data.seat].has_flag[seater]>:
                 - run exit_generator def:<[data.seat].flag[seater]>
@@ -175,13 +178,15 @@ summon_generator:
         - flag <entry[gen].spawned_entity> generator.progress:0
         - flag <entry[gen].spawned_entity> generator.workers:0
 
+        - define spacing 1.5
+
         - define loc <[loc].above[0.5]>
-        - spawn item_display[item=air] <[loc].left[2].face[<[loc]>]> save:display
+        - spawn item_display[item=air] <[loc].left[<[spacing]>].face[<[loc]>]> save:display
         - flag <entry[gen].spawned_entity> seats.1.seat:<entry[display].spawned_entity>
-        - spawn item_display[item=air] <[loc].right[2].face[<[loc]>]> save:display
+        - spawn item_display[item=air] <[loc].right[<[spacing]>].face[<[loc]>]> save:display
         - flag <entry[gen].spawned_entity> seats.2.seat:<entry[display].spawned_entity>
-        - spawn item_display[item=air] <[loc].forward_flat[2].face[<[loc]>]> save:display
+        - spawn item_display[item=air] <[loc].forward_flat[<[spacing]>].face[<[loc]>]> save:display
         - flag <entry[gen].spawned_entity> seats.3.seat:<entry[display].spawned_entity>
-        - spawn item_display[item=air] <[loc].backward_flat[2].face[<[loc]>]> save:display
+        - spawn item_display[item=air] <[loc].backward_flat[<[spacing]>].face[<[loc]>]> save:display
         - flag <entry[gen].spawned_entity> seats.4.seat:<entry[display].spawned_entity>
 

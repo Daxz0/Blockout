@@ -2,7 +2,7 @@ vaulting_detector:
     type: world
     debug: true
     events:
-        on player right clicks entity_flagged:pallet.used:
+        on player right clicks entity_flagged:pallet.used flagged:blockout.team.survivor:
             - define loc <context.entity.location.with_yaw[<player.location.yaw>].backward_flat[1.8]>
             - spawn item_display[item=air] save:holder <[loc]>
             - bmmodel entity:<entry[holder].spawned_entity> model:blockout_anims

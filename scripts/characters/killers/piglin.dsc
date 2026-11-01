@@ -44,7 +44,6 @@ blockout_piglin_disguise:
     type: task
     debug: false
     script:
-        - execute "bm disguise piglin_killer true" as_op
-        - adjust <player> attribute_base_values:<map[scale=1.5;camera_distance=0]>
-        - wait 5t
+        - bmmodel entity:<player> model:piglin_killer
+        - wait 2t
         - adjust <player.bm_entity.model.bone[head]> visible:false
