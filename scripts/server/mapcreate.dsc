@@ -3,7 +3,7 @@ mapcreate:
     debug: false
     events:
         on server prestart:
-            - createworld Ormond
+            - createworld farm
 
         on player joins priority:10:
-            - teleport <player> <world[Ormond].spawn_location>
+            - teleport <player> <world[farm].spawn_location>

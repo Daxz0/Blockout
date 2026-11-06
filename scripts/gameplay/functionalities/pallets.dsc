@@ -35,14 +35,24 @@ pallet_handler:
 
             - else if <context.entity.has_flag[pallet.used]> && <context.entity.has_flag[pallet.broken].not> && <player.has_flag[blockout.team.killer]>:
                 - if <context.entity.flag[pallet.damage]> >= 3:
-                    - bmstate <context.entity> model:<[pallet_model]> state:break
+                    - bmstate entity:<context.entity> model:<[pallet_model]> state:break
                     - define blocks <[loc].find_blocks[barrier].within[2]>
                     - modifyblock <[blocks]> air
                     - flag <[blocks]> pallet_blocking:!
                     - flag <context.entity> pallet.broken
                 - else:
-                    - bmstate <context.entity> model:<[pallet_model]> state:kick
+                    - cast slow amplifier:255 no_icon hide_particles d:2s
+                    - bmstate entity:<player> model:<player.bm_entity.model.name> state:kick
+                    - wait 2.5s
+                    - bmstate entity:<context.entity> model:<[pallet_model]> state:kick
                     - flag <context.entity> pallet.damage:++
+
+                    - if <context.entity.flag[pallet.damage]> >= 3:
+                        - bmstate entity:<context.entity> model:<[pallet_model]> state:break
+                        - define blocks <[loc].find_blocks[barrier].within[2]>
+                        - modifyblock <[blocks]> air
+                        - flag <[blocks]> pallet_blocking:!
+                        - flag <context.entity> pallet.broke
 
 
 

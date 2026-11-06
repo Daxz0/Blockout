@@ -2,13 +2,13 @@ blockout_piglin_killer:
     type: task
     debug: false
     script:
-        - definemap character_data:
+        - definemap stats:
             ## STEALTH
             # reverse scaling, all killers begin with a 30 block danger radius, each stealth subtracts 1.3*stealth from the 30
-            stealth: 8
+            stealth: 3
 
             ## SPEED
-            # speed begins at 0.115 (or l15% the survviros speed), each speed adds an additional 0.05 to the base
+            # speed begins at 0.110 (or l10% the survviros speed), each speed adds an additional 0.01 to the base
             # survivor speed is 0.10
             speed: 3
 
@@ -27,10 +27,11 @@ blockout_piglin_killer:
             # how much slow the killer recieves for attacking
             # base of 2 seconds, subtracts 0.05 every stat
             resiliance: 7
-        
+
         - definemap data:
             name: Piglin
             model_name: piglin_killer
+            stats: <[stats]>
 
 
 
@@ -40,10 +41,3 @@ blockout_piglin_killer:
 # charges using tusks
 
 
-blockout_piglin_disguise:
-    type: task
-    debug: false
-    script:
-        - bmmodel entity:<player> model:piglin_killer
-        - wait 2t
-        - adjust <player.bm_entity.model.bone[head]> visible:false
