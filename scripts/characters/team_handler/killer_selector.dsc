@@ -11,4 +11,4 @@ select_killer:
 
         - bmmodel entity:<player> model:<[data.model_name]>
         - wait 2t
-        - adjust <player.bm_entity.model.bone[head]> visible:false
+        - adjust <player.bm_entity.model.bone[head]> visible:false|<player>

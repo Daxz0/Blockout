@@ -47,7 +47,7 @@ vaulting_detector:
 
         on player right clicks *_carpet:
 
-            - if <player.flag[blockout.team.killer]>:
+            - if <player.has_flag[blockout.team.killer]>:
                 - define loc <context.location.center.with_yaw[<player.location.yaw>].backward_flat[1]>
                 - spawn item_display[item=air] save:holder <[loc].below[1]>
                 - define model <player.bm_entity.model.name>
@@ -67,7 +67,7 @@ vaulting_detector:
                 - spawn item_display[item=air] save:camera <[cameraLoc]>
                 - flag <player> blockout.vaulting expire:1s
                 - adjust <player> spectate:<entry[camera].spawned_entity>
-                - showfake barrier d:1.8s barrier <[cameraLoc]>
+                - showfake barrier d:1.8s <[cameraLoc]>
                 - wait 1.75s
                 - cast invisibility remove <player>
 
@@ -81,7 +81,7 @@ vaulting_detector:
                 - remove <entry[holder].spawned_entity>
 
 
-            - else if <player.flag[blockout.team.survivor]>:
+            - else if <player.has_flag[blockout.team.survivor]>:
                 - define loc <context.location.center.with_yaw[<player.location.yaw>].backward_flat[1].below[1.5]>
                 - spawn item_display[item=air] save:holder <[loc]>
                 - bmmodel entity:<entry[holder].spawned_entity> model:blockout_anims
@@ -90,6 +90,7 @@ vaulting_detector:
                 - cast slow amplifier:255 <player> no_icon hide_particles d:1.1s
                 # - bmmodel entity:<player> model:blockout_anims remove
                 - cast invisibility amplifier:255 <player> no_icon hide_particles d:1.1s
+                - adjust <player> hide_entity:<player.flag[blockout.game.heart]>
                 - wait 0.1
 
                 - define target <context.location.with_yaw[<player.location.yaw>].forward_flat[1.5].find_blocks[air].within[2].first.center.below[0.1]>
@@ -97,12 +98,13 @@ vaulting_detector:
                 - spawn item_display[item=air] save:camera <[cameraLoc]>
                 - flag <player> blockout.vaulting expire:1s
                 - adjust <player> spectate:<entry[camera].spawned_entity>
-                - showfake barrier d:0.9s barrier <[cameraLoc].backward[1]>
+                - showfake barrier d:0.9s <[cameraLoc].backward[1]>
                 - wait 0.75s
 
                 - flag <player> blockout.invulnerable.vault expire:0.35s
 
                 - wait 0.1s
+                - adjust <player> show_entity:<player.flag[blockout.game.heart]>
                 - teleport <player> <[target].with_pitch[<player.location.pitch>].with_yaw[<player.location.yaw>]> relative
                 - adjust <player> spectate:<player>
                 - adjust <player> velocity:<player.location.sub[<player.location.backward_flat[0.5]>].mul[0.1]>

@@ -12,3 +12,12 @@ disable_jump:
 
 
         - adjust <player> attribute_modifiers:<[attributes]>
+
+
+join_handler:
+    type: world
+    debug: false
+    events:
+        on player joins:
+            - run disable_jump
+            - adjust <player> food_level:6
