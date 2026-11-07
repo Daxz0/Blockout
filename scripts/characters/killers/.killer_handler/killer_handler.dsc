@@ -73,7 +73,7 @@ swing_runner:
         - if <[target].first.if_null[true]>:
             - flag <player> blockout.game.killer.swing_cd expire:<[data.stats.swing_speed].mul[-0.15].add[5]>s
         - else:
-            
+            - run survivor_hit def:<[target]>
 
 
 
