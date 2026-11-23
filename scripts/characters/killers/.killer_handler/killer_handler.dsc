@@ -66,14 +66,14 @@ swing_runner:
         - define startLoc <player.eye_location>
         - define beam <[startLoc].points_between[<[startLoc].forward[2.5]>].distance[0.5]>
         - foreach <[beam]> as:point:
-            - define target <[point].find_players_within[0.5].exclude[<player>]>
+            - define target <[point].find_players_within[0.5].exclude[<player>].exclude[<server.online_players_flagged[blockout.game.survivor.knocked]>]>
             - if <[target].any>:
                 - foreach stop
 
-        - if <[target].first.if_null[true]>:
+        - if <[target].is_empty>:
             - flag <player> blockout.game.killer.swing_cd expire:<[data.stats.swing_speed].mul[-0.15].add[5]>s
         - else:
-            - run survivor_hit def:<[target]>
+            - run survivor_hit def:<[target].first>
 
 
 

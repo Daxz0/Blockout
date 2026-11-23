@@ -21,3 +21,6 @@ join_handler:
         on player joins:
             - run disable_jump
             - adjust <player> food_level:6
+        
+        on player quits:
+            - flag <player> blockout.heartbeat_active:!
