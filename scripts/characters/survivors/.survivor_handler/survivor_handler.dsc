@@ -13,11 +13,12 @@ survivor_hit:
             - while <[target].has_flag[blockout.game.survivor.knocked]> && <[target].is_online>:
                 - define loc <[target].location.above[1]>
                 - flag <[loc]> knocked_player expire:2t
+                - flag <[loc]> pickup:<[target]> expire:1t
                 - if <[loc].material.name> == air:
                     - adjust <[target]> noclip:false
-                    - modifyblock barrier <[loc]> players:<server.online_players>
+                    - modifyblock barrier <[loc]>
                     - wait 1t
-                    - modifyblock air <[loc]> players:<server.online_players>
+                    - modifyblock air <[loc]>
 
                 # - adjust <[target]> swimming:true
 

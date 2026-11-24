@@ -118,8 +118,8 @@ update_generator_bar:
         - if <[generator].flag[generator.progress]> < 0:
             - flag <[generator]> generator.progress:0
 
-        - define repairing_ui <&chr[a001].font[repair_bar]><&translate[space.33].font[space:default]>
-        - define fillerChar <&translate[space.-1].font[space:default]><&chr[a002].font[repair_bar]>
+        - define repairing_ui <&chr[a001].font[bars]><&translate[space.33].font[space:default]>
+        - define fillerChar <&translate[space.-1].font[space:default]><&chr[a010].font[bars]>
 
         # - bossbar auto generator_<[generator].uuid> progress:<[generator].flag[generator.progress].div[100]> color:BLUE title:Repairing...<element[ ].repeat[32]> targets:<player>
 

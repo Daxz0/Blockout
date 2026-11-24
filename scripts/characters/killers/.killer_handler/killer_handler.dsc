@@ -74,13 +74,82 @@ swing_runner:
             - flag <player> blockout.game.killer.swing_cd expire:<[data.stats.swing_speed].mul[-0.15].add[5]>s
         - else:
             - run survivor_hit def:<[target].first>
+            - playsound sound:entity.zombie.break_wooden_door <[target].first.location> volume:5
 
+update_wiggle_bar:
+    type: task
+    debug: false
+    definitions: amount|killer|survivor
+    script:
+        - flag <[survivor]> blockout.game.survivor.wiggle:+:<[amount]>
+        - if <[survivor].flag[blockout.game.survivor.wiggle]> >= 105:
+            - remove <[survivor].flag[blockout.game.survivor.pickup]>
+            - flag <[survivor]> blockout.game.survivor.pickup:!
+            - flag <[survivor]> blockout.game.survivor.wiggle:!
+            - flag <[killer]> blockout.game.killer.pickup:!
+            - bmstate entity:<[killer]> state:walk_pickup remove model:<player.bm_entity.model.name>
+            - mount <[survivor]> cancel
+            - stop
+        - if <[survivor].flag[blockout.game.survivor.wiggle]> <= 0:
+            - flag <[survivor]> blockout.game.survivor.wiggle:0
+
+        - define repairing_ui <&chr[a002].font[bars]><&translate[space.33].font[space:default]>
+        - define fillerChar <&translate[space.-1].font[space:default]><&chr[a010].font[bars]>
+
+        - define fillerAmount <[survivor].flag[blockout.game.survivor.wiggle]>
+        - define fillerWidth 26
+        - define totalWidth 214
+        - define defaultFillerPos 0
+        - define defaultFillerBuffer <&translate[space.<[defaultFillerPos]>].font[space:default]>
+        - define fillerCharNew <[fillerChar].repeat[<[fillerAmount]>]>
+
+        - actionbar <&translate[space.<[fillerAmount].mul[2]>].font[space:default]><[repairing_ui]><&translate[space.-<[totalWidth].add[<[fillerWidth]>]>].font[space:default]><[defaultFillerBuffer]><[fillerCharNew]><&translate[space.-<[fillerWidth].add[<[defaultFillerPos]>]>].font[space:default]><&translate[space.<[totalWidth].add[<[fillerWidth]>]>].font[space:default]> targets:<[survivor]>
+
+pickup_handler:
+    type: task
+    debug: false
+    definitions: entity|player
+    script:
+        - if <[entity].has_flag[blockout.team.killer]> && <[player].has_flag[blockout.game.survivor.knocked]>:
+            - cast slow d:1.1s no_icon hide_particles amplifier:255
+            - define data <[entity].flag[blockout.game.killer.data]>
+            - define model <[data.model_name]>
+            - inject update_model_skin
+
+            - bmstate entity:<[entity]> model:<[entity].bm_entity.model.name> state:pickup
+
+            - spawn allay[visible=false;has_ai=false;silent=true] save:holder
+            - flag <[player]> blockout.game.survivor.knocked:!
+            - flag <[player]> blockout.game.survivor.pickup:<entry[holder].spawned_entity>
+            - flag <[entity]> blockout.game.killer.pickup:<[player]>
+            - bmstate entity:<[entity]> model:<[entity].bm_entity.model.name> state:walk_pickup loop:loop
+            - mount <[player]>|<entry[holder].spawned_entity>|<[entity]>
+
+        - while <[entity].has_flag[blockout.game.killer.pickup]> && <[player].is_online> && <[entity].is_online>:
+            - cast invisibility d:5t no_icon hide_particles <[player]>
+            - wait 5t
+            - run update_wiggle_bar def:1|<[entity]>|<[player]>
+
+        - flag <[player]> blockout.game.survivor.pickup:!
 
 
 killer_handler:
     type: world
     debug: false
     events:
+        on player right clicks block location_flagged:pickup:
+            - ratelimit <player> 10t
+            - stop if:<player.has_flag[blockout.game.killer.pickup]>
+            - define player <context.location.flag[pickup]>
+            - run pickup_handler def:<player>|<[player]>
+
+        on player right clicks player:
+            - narrate hi
+            - ratelimit <player> 10t
+            - stop if:<player.has_flag[blockout.game.killer.pickup]>
+            - define player <context.entity>
+            - run pickup_handler def:<player>|<[player]>
+
         on delta time secondly every:1:
             - foreach <server.online_players_flagged[blockout.team.killer]> as:killer:
                 - define data <[killer].flag[blockout.game.killer.data]>
@@ -88,9 +157,10 @@ killer_handler:
 
 
         on player left clicks block flagged:blockout.team.killer:
+            - ratelimit <player> 10t
             - inject swing_runner
 
         on player damages player:
             - determine passively cancelled
-            - if <player.has_flag[blockout.team.killer]>:
+            - if <context.damager.has_flag[blockout.team.killer]>:
                 - inject swing_runner

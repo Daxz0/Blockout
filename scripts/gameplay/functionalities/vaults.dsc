@@ -16,7 +16,10 @@ vaulting_detector:
                 - bmstate model:blockout_anims state:pallet_vault2 entity:<entry[holder].spawned_entity>
             - else:
                 - bmstate model:blockout_anims state:pallet_vault entity:<entry[holder].spawned_entity>
-            - inject update_model_skin
+            - define player <player>
+            - define entity <entry[holder].spawned_entity>
+            - define model blockout_anims
+            # - inject vault_update_model_skin
             - cast slow amplifier:255 <player> no_icon hide_particles d:1.8s
             # - bmmodel entity:<player> model:blockout_anims remove
             - cast invisibility amplifier:255 <player> no_icon hide_particles d:1s
@@ -86,7 +89,10 @@ vaulting_detector:
                 - spawn item_display[item=air] save:holder <[loc]>
                 - bmmodel entity:<entry[holder].spawned_entity> model:blockout_anims
                 - bmstate model:blockout_anims state:vault entity:<entry[holder].spawned_entity>
-                - inject update_model_skin
+                - define player <player>
+                - define entity <entry[holder].spawned_entity>
+                - define model blockout_anims
+                # - inject vault_update_model_skin
                 - cast slow amplifier:255 <player> no_icon hide_particles d:1.1s
                 # - bmmodel entity:<player> model:blockout_anims remove
                 - cast invisibility amplifier:255 <player> no_icon hide_particles d:1.1s
@@ -117,20 +123,29 @@ vaulting_detector:
 
 
 
+vault_update_model_skin:
+    type: task
+    debug: false
+    definitions: entity|model|player
+    script:
+        - bmpart entity:<[entity]> model:<[model]> bone:h_ph_head part:head from:<[player]>
+        - bmpart entity:<[entity]> model:<[model]> bone:pc_chest part:chest from:<[player]>
+        - bmpart entity:<[entity]> model:<[model]> bone:pla_left_arm part:left_arm from:<[player]>
+        - bmpart entity:<[entity]> model:<[model]> bone:pra_right_arm part:right_arm from:<[player]>
+        - bmpart entity:<[entity]> model:<[model]> bone:prfa_right_forearm part:right_forearm from:<[player]>
+        - bmpart entity:<[entity]> model:<[model]> bone:plfa_left_forearm part:left_forearm from:<[player]>
+        - bmpart entity:<[entity]> model:<[model]> bone:pll_left_leg part:left_leg from:<[player]>
+        - bmpart entity:<[entity]> model:<[model]> bone:prl_right_leg part:right_leg from:<[player]>
+        - bmpart entity:<[entity]> model:<[model]> bone:prfl_right_foreleg part:right_foreleg from:<[player]>
+        - bmpart entity:<[entity]> model:<[model]> bone:plfl_left_foreleg part:left_foreleg from:<[player]>
+        - bmpart entity:<[entity]> model:<[model]> bone:pw_waist part:waist from:<[player]>
+
+
 update_model_skin:
     type: task
     debug: false
+    definitions: entity|model|player
     script:
-        - bmpart entity:<entry[holder].spawned_entity> model:blockout_anims bone:head part:head from:<player>
-        - bmpart entity:<entry[holder].spawned_entity> model:blockout_anims bone:chest part:chest from:<player>
-        - bmpart entity:<entry[holder].spawned_entity> model:blockout_anims bone:left_arm part:left_arm from:<player>
-        - bmpart entity:<entry[holder].spawned_entity> model:blockout_anims bone:right_arm part:right_arm from:<player>
-        - bmpart entity:<entry[holder].spawned_entity> model:blockout_anims bone:right_forearm part:right_forearm from:<player>
-        - bmpart entity:<entry[holder].spawned_entity> model:blockout_anims bone:left_forearm part:left_forearm from:<player>
-        - bmpart entity:<entry[holder].spawned_entity> model:blockout_anims bone:chest part:chest from:<player>
-        - bmpart entity:<entry[holder].spawned_entity> model:blockout_anims bone:left_leg part:left_leg from:<player>
-        - bmpart entity:<entry[holder].spawned_entity> model:blockout_anims bone:right_leg part:right_leg from:<player>
-        - bmpart entity:<entry[holder].spawned_entity> model:blockout_anims bone:right_foreleg part:right_foreleg from:<player>
-        - bmpart entity:<entry[holder].spawned_entity> model:blockout_anims bone:left_foreleg part:left_foreleg from:<player>
-        - bmpart entity:<entry[holder].spawned_entity> model:blockout_anims bone:waist part:waist from:<player>
-        - bmpart entity:<entry[holder].spawned_entity> model:blockout_anims bone:hip part:hip from:<player>
+        - define limbs <list[hip|head|chest|left_arm|right_arm|right_forearm|left_forearm|left_leg|right_leg|right_foreleg|left_foreleg|waist]>
+        - foreach <[limbs]> as:limb:
+            - bmpart entity:<[entity]> model:<[model]> bone:player_<[limb]> part:<[limb]> from:<[player]>
