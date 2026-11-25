@@ -3,6 +3,7 @@ vaulting_detector:
     debug: false
     events:
         on player right clicks entity_flagged:pallet.used flagged:blockout.team.survivor:
+            - ratelimit <player> 1s
             - define loc <context.entity.location.with_yaw[<player.location.yaw>].backward_flat[1.8]>
             - spawn item_display[item=air] save:holder <[loc]>
             - bmmodel entity:<entry[holder].spawned_entity> model:blockout_anims
@@ -19,10 +20,10 @@ vaulting_detector:
             - define player <player>
             - define entity <entry[holder].spawned_entity>
             - define model blockout_anims
-            # - inject vault_update_model_skin
+            - inject vault_update_model_skin
             - cast slow amplifier:255 <player> no_icon hide_particles d:1.8s
             # - bmmodel entity:<player> model:blockout_anims remove
-            - cast invisibility amplifier:255 <player> no_icon hide_particles d:1s
+            - cast invisibility amplifier:255 <player> no_icon hide_particles d:2.5s
             - wait 0.1
 
             - define target <context.entity.location.with_yaw[<player.location.yaw>].forward_flat[2.5].find_blocks[air].within[2].first.center.below[0.4]>
@@ -44,12 +45,13 @@ vaulting_detector:
             - remove <entry[camera].spawned_entity>
             - remove <entry[holder].spawned_entity>
 
+            - flag <player> blockout.invulnerable:!
 
 
 
 
         on player right clicks *_carpet:
-
+            - ratelimit <player> 1s
             - if <player.has_flag[blockout.team.killer]>:
                 - define loc <context.location.center.with_yaw[<player.location.yaw>].backward_flat[1]>
                 - spawn item_display[item=air] save:holder <[loc].below[1]>
@@ -119,26 +121,27 @@ vaulting_detector:
                 - remove <entry[camera].spawned_entity>
                 - remove <entry[holder].spawned_entity>
                 # - bmmodel entity:<player> model:blockout_anims
-
+                - flag <player> blockout.invulnerable:!
 
 
 
 vault_update_model_skin:
     type: task
     debug: false
-    definitions: entity|model|player
     script:
-        - bmpart entity:<[entity]> model:<[model]> bone:h_ph_head part:head from:<[player]>
-        - bmpart entity:<[entity]> model:<[model]> bone:pc_chest part:chest from:<[player]>
-        - bmpart entity:<[entity]> model:<[model]> bone:pla_left_arm part:left_arm from:<[player]>
-        - bmpart entity:<[entity]> model:<[model]> bone:pra_right_arm part:right_arm from:<[player]>
-        - bmpart entity:<[entity]> model:<[model]> bone:prfa_right_forearm part:right_forearm from:<[player]>
-        - bmpart entity:<[entity]> model:<[model]> bone:plfa_left_forearm part:left_forearm from:<[player]>
-        - bmpart entity:<[entity]> model:<[model]> bone:pll_left_leg part:left_leg from:<[player]>
-        - bmpart entity:<[entity]> model:<[model]> bone:prl_right_leg part:right_leg from:<[player]>
-        - bmpart entity:<[entity]> model:<[model]> bone:prfl_right_foreleg part:right_foreleg from:<[player]>
-        - bmpart entity:<[entity]> model:<[model]> bone:plfl_left_foreleg part:left_foreleg from:<[player]>
-        - bmpart entity:<[entity]> model:<[model]> bone:pw_waist part:waist from:<[player]>
+        - bmpart entity:<entry[holder].spawned_entity> model:blockout_anims bone:head part:head from:<player>
+        - bmpart entity:<entry[holder].spawned_entity> model:blockout_anims bone:chest part:chest from:<player>
+        - bmpart entity:<entry[holder].spawned_entity> model:blockout_anims bone:left_arm part:left_arm from:<player>
+        - bmpart entity:<entry[holder].spawned_entity> model:blockout_anims bone:right_arm part:right_arm from:<player>
+        - bmpart entity:<entry[holder].spawned_entity> model:blockout_anims bone:right_forearm part:right_forearm from:<player>
+        - bmpart entity:<entry[holder].spawned_entity> model:blockout_anims bone:left_forearm part:left_forearm from:<player>
+        - bmpart entity:<entry[holder].spawned_entity> model:blockout_anims bone:chest part:chest from:<player>
+        - bmpart entity:<entry[holder].spawned_entity> model:blockout_anims bone:left_leg part:left_leg from:<player>
+        - bmpart entity:<entry[holder].spawned_entity> model:blockout_anims bone:right_leg part:right_leg from:<player>
+        - bmpart entity:<entry[holder].spawned_entity> model:blockout_anims bone:right_foreleg part:right_foreleg from:<player>
+        - bmpart entity:<entry[holder].spawned_entity> model:blockout_anims bone:left_foreleg part:left_foreleg from:<player>
+        - bmpart entity:<entry[holder].spawned_entity> model:blockout_anims bone:waist part:waist from:<player>
+        - bmpart entity:<entry[holder].spawned_entity> model:blockout_anims bone:hip part:hip from:<player>
 
 
 update_model_skin:

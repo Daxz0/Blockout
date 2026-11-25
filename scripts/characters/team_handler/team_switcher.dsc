@@ -20,6 +20,8 @@ team_switcher_survivor:
     debug: false
     script:
         - flag <player> blockout.team.killer:!
+        - flag <player> blockout.game.survivor:!
+        - flag <player> blockout.game.killer:!
         - flag <player> blockout.team.survivor
         - adjust <player> attribute_base_values:<map[scale=1;camera_distance=2.5]>
         - adjust <player> speed:0.1
@@ -35,6 +37,7 @@ team_switcher_survivor:
         - mount <entry[heart].spawned_entity>|<player> <player.location.with_pitch[0].with_yaw[0]>
         - flag <player> blockout.game.heart:<entry[heart].spawned_entity>
         - narrate "<&a>team set to survivor"
+        - team name:survivor add:<player> option:name_tag_visibility status:never
 team_switcher_killer:
     type: task
     debug: false
@@ -46,4 +49,5 @@ team_switcher_killer:
             - remove <player.flag[blockout.game.heart]>
 
         - adjust <player> attribute_base_values:<map[scale=1.5;camera_distance=0]>
+        - team name:killer add:<player> option:name_tag_visibility status:never
         - narrate "<&4>team set to killer"

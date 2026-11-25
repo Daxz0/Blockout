@@ -114,6 +114,7 @@ update_generator_bar:
             - foreach <[generator].flag[seats]> as:data:
                 - if <[data.seat].has_flag[seater]>:
                     - run exit_generator def:<[data.seat].flag[seater]>
+            - announce "gen done +1"
             - stop
         - if <[generator].flag[generator.progress]> < 0:
             - flag <[generator]> generator.progress:0

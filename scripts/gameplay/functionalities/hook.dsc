@@ -35,13 +35,16 @@ hook_handler:
                 - wait 1s
                 - if <[survivor].flag[blockout.game.survivor.hook_count]> >= 100:
                     - bmstate entity:<context.entity> model:hook state:activate remove
+                    - wait 2t
                     - bmstate entity:<context.entity> model:hook state:death loop:hold
                     - adjust <[survivor]> gamemode:spectator
                     - while stop
 
             - cast invisibility remove <[survivor]>
             - mount <[survivor]> cancel
+            - bmstate entity:<context.entity> model:hook state:activate loop:once
             - bmstate entity:<context.entity> model:hook state:activate remove
+            - flag <[survivor]> blockout.game.survivor.hits:0
 
 
         on player input flagged:blockout.game.survivor.hooked:

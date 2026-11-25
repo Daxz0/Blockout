@@ -75,6 +75,8 @@ swing_runner:
         - else:
             - run survivor_hit def:<[target].first>
             - playsound sound:entity.zombie.break_wooden_door <[target].first.location> volume:5
+            - stop if:<[target].flag[blockout.game.survivor.hits].is_more_than_or_equal_to[2]>
+                - cast speed amplifier:2 duration:4s <[target].first> no_icon hide_particles
 
 update_wiggle_bar:
     type: task
