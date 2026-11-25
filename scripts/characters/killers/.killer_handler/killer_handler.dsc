@@ -111,7 +111,7 @@ pickup_handler:
     definitions: entity|player
     script:
         - if <[entity].has_flag[blockout.team.killer]> && <[player].has_flag[blockout.game.survivor.knocked]>:
-            - cast slow d:1.1s no_icon hide_particles amplifier:255
+            - cast slow d:0.75s no_icon hide_particles amplifier:255
             - define data <[entity].flag[blockout.game.killer.data]>
             - define model <[data.model_name]>
             - inject update_model_skin
@@ -144,7 +144,6 @@ killer_handler:
             - run pickup_handler def:<player>|<[player]>
 
         on player right clicks player:
-            - narrate hi
             - ratelimit <player> 10t
             - stop if:<player.has_flag[blockout.game.killer.pickup]>
             - define player <context.entity>

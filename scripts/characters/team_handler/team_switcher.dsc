@@ -3,7 +3,7 @@ team_switch:
     debug: false
     name: team_select
     description: switch teams yo
-    permissions: op
+    # permissions: op
     usage: /team_select s(survivor)|k(killer)
     tab completions:
         1: s|k

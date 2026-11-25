@@ -92,7 +92,7 @@ vaulting_detector:
                 - define player <player>
                 - define entity <entry[holder].spawned_entity>
                 - define model blockout_anims
-                # - inject vault_update_model_skin
+                - inject vault_update_model_skin
                 - cast slow amplifier:255 <player> no_icon hide_particles d:1.1s
                 # - bmmodel entity:<player> model:blockout_anims remove
                 - cast invisibility amplifier:255 <player> no_icon hide_particles d:1.1s
