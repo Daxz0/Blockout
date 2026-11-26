@@ -14,6 +14,7 @@ hook_handler:
     events:
         on player right clicks entity_flagged:hook flagged:blockout.team.killer:
             - stop if:<player.has_flag[blockout.game.killer.pickup].not>
+            - stop if:<context.entity.has_flag[hooked]>
             - define killer <player>
             - define survivor <player.flag[blockout.game.killer.pickup]>
             - remove <[survivor].flag[blockout.game.survivor.pickup]>
@@ -27,6 +28,7 @@ hook_handler:
             - mount <[survivor]> cancel
             - mount <[survivor]>|<context.entity>
             - cast invisibility d:120 no_icon hide_particles <[survivor]>
+            - glow <[survivor]> for:<server.players_flagged[blockout.team.survivor]> true
 
             - flag <context.entity> hooked:<[survivor]> expire:120s
 
@@ -44,14 +46,16 @@ hook_handler:
             - mount <[survivor]> cancel
             - bmstate entity:<context.entity> model:hook state:activate loop:once
             - bmstate entity:<context.entity> model:hook state:activate remove
-            - flag <[survivor]> blockout.game.survivor.hits:0
+            - flag <[survivor]> blockout.game.survivor.hits:!
 
+            - glow <[survivor]> for:<server.players_flagged[blockout.team.survivor]> false
 
         on player input flagged:blockout.game.survivor.hooked:
             - determine passively cancelled
 
         on player right clicks entity_flagged:hook flagged:blockout.team.survivor:
-            - stop if:<player.has_flag[blockout.game.killer.knocked]>
+            - stop if:<player.has_flag[blockout.game.survivor.knocked]>
+            - stop if:<player.has_flag[blockout.game.survivor.hooked]>
             - define hooked_player <context.entity.flag[hooked]>
             - flag <[hooked_player]> blockout.game.survivor.hooked:!
 

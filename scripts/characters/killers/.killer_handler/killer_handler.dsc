@@ -56,7 +56,6 @@ swing_runner:
     script:
         - stop if:<player.has_flag[blockout.game.killer.swing_cd]>
         - define data <player.flag[blockout.game.killer.data]>
-        - flag <player> blockout.game.killer.swing_cd expire:<[data.stats.swing_speed].mul[-0.15].add[3.5]>s
 
         - bmstate entity:<player> model:<player.bm_entity.model.name> state:swing
 
@@ -73,10 +72,14 @@ swing_runner:
         - if <[target].is_empty>:
             - flag <player> blockout.game.killer.swing_cd expire:<[data.stats.swing_speed].mul[-0.15].add[5]>s
         - else:
+            - flag <player> blockout.game.killer.swing_cd expire:<[data.stats.swing_speed].mul[-0.15].add[3.5]>s
             - run survivor_hit def:<[target].first>
             - playsound sound:entity.zombie.break_wooden_door <[target].first.location> volume:5
             - stop if:<[target].flag[blockout.game.survivor.hits].is_more_than_or_equal_to[2]>
                 - cast speed amplifier:2 duration:4s <[target].first> no_icon hide_particles
+
+
+
 
 update_wiggle_bar:
     type: task
@@ -145,7 +148,7 @@ killer_handler:
             - define player <context.location.flag[pickup]>
             - run pickup_handler def:<player>|<[player]>
 
-        on player right clicks player:
+        on player right clicks player priority:100:
             - ratelimit <player> 10t
             - stop if:<player.has_flag[blockout.game.killer.pickup]>
             - define player <context.entity>
@@ -160,8 +163,7 @@ killer_handler:
         on player left clicks block flagged:blockout.team.killer:
             - ratelimit <player> 10t
             - inject swing_runner
-
         on player damages player:
-            - determine passively cancelled
             - if <context.damager.has_flag[blockout.team.killer]>:
                 - inject swing_runner
+            - determine passively cancelled

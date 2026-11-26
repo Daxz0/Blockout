@@ -18,6 +18,7 @@ pallet_handler:
     debug: true
     events:
         on player right clicks entity_flagged:pallet:
+        
             - ratelimit <player> 1s
             - define pallet_model pallet
             - define loc <context.entity.location>

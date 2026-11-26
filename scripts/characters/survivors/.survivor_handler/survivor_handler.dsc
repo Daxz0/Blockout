@@ -27,4 +27,4 @@ survivor_hit:
 #     type: world
 #     debug: false
 #     events:
-        
+        # on player right clicks player:

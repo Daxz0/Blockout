@@ -38,6 +38,7 @@ team_switcher_survivor:
         - flag <player> blockout.game.heart:<entry[heart].spawned_entity>
         - narrate "<&a>team set to survivor"
         - team name:survivor add:<player> option:name_tag_visibility status:never
+        - team name:survivor add:<player> option:SEE_INVISIBLE status:never
 team_switcher_killer:
     type: task
     debug: false

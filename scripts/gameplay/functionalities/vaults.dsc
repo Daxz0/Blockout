@@ -3,6 +3,7 @@ vaulting_detector:
     debug: false
     events:
         on player right clicks entity_flagged:pallet.used flagged:blockout.team.survivor:
+            - stop if:<player.has_flag[blockout.game.killer.knocked]>
             - ratelimit <player> 1s
             - define loc <context.entity.location.with_yaw[<player.location.yaw>].backward_flat[1.8]>
             - spawn item_display[item=air] save:holder <[loc]>
@@ -51,6 +52,7 @@ vaulting_detector:
 
 
         on player right clicks *_carpet:
+            - stop if:<player.has_flag[blockout.game.killer.knocked]>
             - ratelimit <player> 1s
             - if <player.has_flag[blockout.team.killer]>:
                 - define loc <context.location.center.with_yaw[<player.location.yaw>].backward_flat[1]>
