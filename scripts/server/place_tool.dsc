@@ -126,6 +126,7 @@ blockout_icon_pallet:
     material: oak_planks
     display name: <&e>Summon Pallet
 
+
 blockout_menu_events:
     type: world
     debug: false

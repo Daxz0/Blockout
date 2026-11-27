@@ -5,14 +5,24 @@ blockout_start_game:
         - run assign_teams
         - run blockout_reset def:all
 
+
 assign_teams:
     type: task
     debug: false
     script:
+        - define removalList <server.flag[blockout.starting_locations]>
         - define killer <server.online_players.random>
         - run team_switcher_survivor def:<[killer]>
+
+        - define loc <[removalList].random>
+        - teleport <[killer]> <[loc]>
+        - define removalList:<-:<[loc]>
+
         - foreach <server.online_players.exclude[<[killer]>]> as:player:
             - flag <[player]> blockout:!
+            - define loc <[removalList].random>
+            - teleport <[player]> <[loc]>
+            - define removalList:<-:<[loc]>
             - run team_switcher_survivor def:<[player]>
 
 
@@ -21,6 +31,9 @@ blockout_reset:
     debug: false
     definitions: type
     script:
+
+        - modifyblock exit1 spruce_planks
+        - modifyblock exit2 spruce_planks
 
         - define type <[type].if_null[all]>
         - if <[type]> == all:
