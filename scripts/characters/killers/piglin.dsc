@@ -10,7 +10,7 @@ blockout_piglin_killer:
             ## SPEED
             # speed begins at 0.110 (or l10% the survviros speed), each speed adds an additional 0.01 to the base
             # survivor speed is 0.10
-            speed: 3
+            speed: 8
 
             ## SWING SPEED
             # cooldown between swings, sounds kinda counterintituative but wtv

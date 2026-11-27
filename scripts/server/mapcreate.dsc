@@ -4,6 +4,7 @@ mapcreate:
     events:
         on server prestart:
             - createworld farm
+            - createworld lobby
 
         on player joins priority:10:
-            - teleport <player> <world[farm].spawn_location>
+            - teleport <player> <world[lobby].spawn_location>

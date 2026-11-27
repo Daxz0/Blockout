@@ -1,15 +1,15 @@
-summon_pallet:
-    type: task
-    debug: false
-    definitions: loc
-    script:
-        - define loc <player.location.backward_flat[0.7]>
-        - spawn item_display[item=air] <[loc]> save:pallet
-        - bmmodel entity:<entry[pallet].spawned_entity> model:pallet
-        - flag <entry[pallet].spawned_entity> pallet.damage:0
-        - wait 1t
-        - bmstate entity:<entry[pallet].spawned_entity> model:pallet state:start loop:hold
-        - flag <entry[pallet].spawned_entity> facing_right_location:<[loc].yaw.add[90]>
+# summon_pallet:
+#     type: task
+#     debug: false
+#     definitions: loc
+#     script:
+#         - define loc <player.location.backward_flat[0.7]>
+#         - spawn item_display[item=air] <[loc]> save:pallet
+#         - bmmodel entity:<entry[pallet].spawned_entity> model:pallet
+#         - flag <entry[pallet].spawned_entity> pallet.damage:0
+#         - wait 1t
+#         - bmstate entity:<entry[pallet].spawned_entity> model:pallet state:start loop:hold
+#         - flag <entry[pallet].spawned_entity> facing_right_location:<[loc].yaw.add[90]>
 
 
 
@@ -18,7 +18,6 @@ pallet_handler:
     debug: true
     events:
         on player right clicks entity_flagged:pallet:
-        
             - ratelimit <player> 1s
             - define pallet_model pallet
             - define loc <context.entity.location>
@@ -26,34 +25,36 @@ pallet_handler:
 
             - if <context.entity.has_flag[pallet.used].not> && <player.has_flag[blockout.team.survivor]>:
                 - bmstate model:<[pallet_model]> state:start remove
-                - bmstate entity:<context.entity> model:<[pallet_model]> state:activate loop:hold
+                - bmstate entity:<context.entity> model:<[pallet_model]> state:activate loop:once
 
-                - define blocks <[loc].find_blocks[air].within[1.5].filter[y.equals[<[loc].y>]]>
+                - define blocks <[loc].find_blocks[air].within[1.25].filter[y.equals[<[loc].y>]]>
+
+                - define killers <[loc].find_players_within[1.5].filter[has_flag[blockout.team.killer]]>
+
+                - cast slow amplifier:255 d:2 hide_particles no_icon <[killers]>
+
+
                 - modifyblock <[blocks]> barrier
                 - flag <[blocks]> pallet_blocking
                 - wait 1t
                 - flag <context.entity> pallet.used
 
+                - wait 0.15s
+                - bmstate entity:<context.entity> model:<[pallet_model]> state:hold loop:hold
+
+
             - else if <context.entity.has_flag[pallet.used]> && <context.entity.has_flag[pallet.broken].not> && <player.has_flag[blockout.team.killer]>:
-                - if <context.entity.flag[pallet.damage]> >= 3:
-                    - bmstate entity:<context.entity> model:<[pallet_model]> state:break
-                    - define blocks <[loc].find_blocks[barrier].within[2]>
-                    - modifyblock <[blocks]> air
-                    - flag <[blocks]> pallet_blocking:!
-                    - flag <context.entity> pallet.broken
-                - else:
-                    - cast slow amplifier:255 no_icon hide_particles d:2s
-                    - bmstate entity:<player> model:<player.bm_entity.model.name> state:kick
-                    - wait 2.5s
-                    - bmstate entity:<context.entity> model:<[pallet_model]> state:kick
-                    - flag <context.entity> pallet.damage:++
-
-                    - if <context.entity.flag[pallet.damage]> >= 3:
-                        - bmstate entity:<context.entity> model:<[pallet_model]> state:break
-                        - define blocks <[loc].find_blocks[barrier].within[2]>
-                        - modifyblock <[blocks]> air
-                        - flag <[blocks]> pallet_blocking:!
-                        - flag <context.entity> pallet.broke
-
-
+                - stop if:<context.entity.has_flag[vaulting_player]>
+                - flag <context.entity> pallet.damage:++
+                - cast slow amplifier:255 no_icon hide_particles d:2s
+                - bmstate entity:<player> model:<player.bm_entity.model.name> state:kick
+                - wait 2s
+                - bmstate entity:<context.entity> model:<[pallet_model]> state:kick
+                - wait 0.38s
+                - bmstate model:<[pallet_model]> state:activate remove
+                - bmstate entity:<context.entity> model:<[pallet_model]> state:break loop:hold
+                - define blocks <[loc].find_blocks[barrier].within[2]>
+                - modifyblock <[blocks]> air
+                - flag <[blocks]> pallet_blocking:!
+                - flag <context.entity> pallet.broken
 

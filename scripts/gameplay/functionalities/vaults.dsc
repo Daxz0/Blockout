@@ -3,6 +3,8 @@ vaulting_detector:
     debug: false
     events:
         on player right clicks entity_flagged:pallet.used flagged:blockout.team.survivor:
+            - stop if:<context.entity.has_flag[vaulting_player]>
+            - flag <context.entity> vaulting_player:<player> expire:3s
             - stop if:<player.has_flag[blockout.game.killer.knocked]>
             - ratelimit <player> 1s
             - define loc <context.entity.location.with_yaw[<player.location.yaw>].backward_flat[1.8]>
@@ -24,7 +26,7 @@ vaulting_detector:
             - inject vault_update_model_skin
             - cast slow amplifier:255 <player> no_icon hide_particles d:1.8s
             # - bmmodel entity:<player> model:blockout_anims remove
-            - cast invisibility amplifier:255 <player> no_icon hide_particles d:2.5s
+            - cast invisibility amplifier:255 <player> no_icon hide_particles d:2s
             - wait 0.1
 
             - define target <context.entity.location.with_yaw[<player.location.yaw>].forward_flat[2.5].find_blocks[air].within[2].first.center.below[0.4]>
@@ -32,7 +34,7 @@ vaulting_detector:
             - spawn item_display[item=air] save:camera <[cameraLoc]>
             - flag <player> blockout.vaulting expire:1s
             - adjust <player> spectate:<entry[camera].spawned_entity>
-            - showfake barrier d:2s barrier <[cameraLoc].backward[1]>
+            - showfake barrier d:2s <[cameraLoc].backward[1]>
             - wait 0.75s
 
             - flag <player> blockout.invulnerable.vault expire:0.35s
@@ -53,8 +55,12 @@ vaulting_detector:
 
         on player right clicks *_carpet:
             - stop if:<player.has_flag[blockout.game.killer.knocked]>
+            - stop if:<context.location.has_flag[vaulting_player]>
             - ratelimit <player> 1s
+            - flag <context.location.find_blocks[*_carpet].within[3]> vaulting_player:<player> expire:1s
             - if <player.has_flag[blockout.team.killer]>:
+                - define target <context.location.with_yaw[<player.location.yaw>].forward_flat[1.5].find_blocks[air].within[2].first.center.below[0.1]>
+                - stop if:<[target].below[1].material.is_solid>
                 - define loc <context.location.center.with_yaw[<player.location.yaw>].backward_flat[1]>
                 - spawn item_display[item=air] save:holder <[loc].below[1]>
                 - define model <player.bm_entity.model.name>
@@ -69,7 +75,6 @@ vaulting_detector:
                 - cast invisibility amplifier:255 <player> no_icon hide_particles d:2s
                 - wait 0.1
 
-                - define target <context.location.with_yaw[<player.location.yaw>].forward_flat[1.5].find_blocks[air].within[2].first.center.below[0.1]>
                 - define cameraLoc <[loc].above[1.25].backward_flat[1].with_pitch[45]>
                 - spawn item_display[item=air] save:camera <[cameraLoc]>
                 - flag <player> blockout.vaulting expire:1s
@@ -89,6 +94,8 @@ vaulting_detector:
 
 
             - else if <player.has_flag[blockout.team.survivor]>:
+                - define target <context.location.with_yaw[<player.location.yaw>].forward_flat[1.5].find_blocks[air].within[2].first.center.below[0.1]>
+                - stop if:<[target].below[1].material.is_solid>
                 - define loc <context.location.center.with_yaw[<player.location.yaw>].backward_flat[1].below[1.5]>
                 - spawn item_display[item=air] save:holder <[loc]>
                 - bmmodel entity:<entry[holder].spawned_entity> model:blockout_anims
@@ -103,7 +110,6 @@ vaulting_detector:
                 - adjust <player> hide_entity:<player.flag[blockout.game.heart]>
                 - wait 0.1
 
-                - define target <context.location.with_yaw[<player.location.yaw>].forward_flat[1.5].find_blocks[air].within[2].first.center.below[0.1]>
                 - define cameraLoc <[loc].above[2].backward_flat[1]>
                 - spawn item_display[item=air] save:camera <[cameraLoc]>
                 - flag <player> blockout.vaulting expire:1s

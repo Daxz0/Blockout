@@ -29,7 +29,7 @@ ability_display_test:
     debug: false
     script:
         # - while <player.is_online>:
-            - bossbar ability_ui_<player.uuid> <element[<&lt>color:#fffcfc<&gt><&lt>!shadow<&gt><&lt>font:killer_abilities<&gt><&chr[a001]><&chr[a010]><&lt>/font<&gt><element[ ].repeat[10]>4].parse_minimessage>
+            # - bossbar ability_ui_<player.uuid> <element[<&lt>color:#fffcfc<&gt><&lt>!shadow<&gt><&lt>font:killer_abilities<&gt><&chr[a001]><&chr[a010]><&lt>/font<&gt><element[ ].repeat[10]>4].parse_minimessage>
 
             # please paper just let me hide shadows
 

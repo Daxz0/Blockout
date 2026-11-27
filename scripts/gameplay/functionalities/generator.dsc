@@ -32,7 +32,7 @@ generator_detection:
             - playeffect effect:smoke <[generator].location.above[0.8]> quantity:50
 
         # survivor interaction
-        on player right clicks flagged:!blockout.generator entity_flagged:generator:
+        on player right clicks flagged:!blockout.game.survivor.generator entity_flagged:generator:
             - stop if:<player.has_flag[blockout.team.killer]>
             - define generator <context.entity>
             - stop if:<[generator].has_flag[status.disabled]>
@@ -45,8 +45,8 @@ generator_detection:
                 - foreach next if:<[data.seat].has_flag[seater]>
 
                 - flag <[data.seat]> seater:<player>
-                - flag <player> blockout.generator.seat:<[data.seat]>
-                - flag <player> blockout.generator.entity:<[generator]>
+                - flag <player> blockout.game.survivor.generator.seat:<[data.seat]>
+                - flag <player> blockout.game.survivor.generator.entity:<[generator]>
 
                 - bmmodel entity:<player> model:blockout_anims
                 - bmstate model:blockout_anims state:generator_fix entity:<player> loop:loop
@@ -57,7 +57,7 @@ generator_detection:
             - define base_speed 1
             - define base_skill_check_chance 8
 
-            - while <player.has_flag[blockout.generator]>:
+            - while <player.has_flag[blockout.game.survivor.generator]>:
                 - if <util.random_chance[<[base_skill_check_chance]>]>:
                     - ~run skill_check
                 - else if <player.has_flag[blockout.skill_check.fail]>:
@@ -66,8 +66,8 @@ generator_detection:
                     - stop
                 - run update_generator_bar def:1|<[generator]>
                 - wait <[base_speed]>
-        on player input flagged:blockout.generator:
-            - define generator <player.flag[blockout.generator.entity].if_null[0]>
+        on player input flagged:blockout.game.survivor.generator:
+            - define generator <player.flag[blockout.game.survivor.generator.entity].if_null[0]>
             - if <context.forward> || <context.backward> || <context.left> || <context.right> || <context.sneak>:
                 - if <player.has_flag[blockout.skill_check]>:
                     - run generator_fail
@@ -102,6 +102,20 @@ generator_detection:
             - else:
                 - determine passively cancelled
 
+update_generator_completion:
+    type: task
+    debug: false
+    definitions: players
+    script:
+        - if <server.flag[blockout.generator_count].if_null[0]> >= 7:
+            - announce "<&2><&l>REQUIRED GENERATORS COMPLETED - EXIT GATES ARE NOW OPEN"
+            - modifyblock exit1 air
+            - modifyblock exit2 air
+        - flag server blockout.generator_count:+:1
+        - announce "<&a>A generator has been completed by <[players].formatted>" to_flagged:blockout.team.survivors
+
+
+
 update_generator_bar:
     type: task
     debug: false
@@ -111,10 +125,12 @@ update_generator_bar:
         - if <[generator].flag[generator.progress]> >= 100:
             - flag <[generator]> status.completed
             - bmstate entity:<[generator]> state:active model:generator_temp
+            - define players <list>
             - foreach <[generator].flag[seats]> as:data:
                 - if <[data.seat].has_flag[seater]>:
                     - run exit_generator def:<[data.seat].flag[seater]>
-            - announce "gen done +1"
+                    - define players:->:<[data.seat].flag[seater]>
+            - run update_generator_completion def:<[players]>
             - stop
         - if <[generator].flag[generator.progress]> < 0:
             - flag <[generator]> generator.progress:0
@@ -139,12 +155,12 @@ exit_generator:
     debug: false
     definitions: player
     script:
-        - flag <[player].flag[blockout.generator.seat]> seater:!
-        - flag <[player].flag[blockout.generator.entity]> generator.workers:--
+        - flag <[player].flag[blockout.game.survivor.generator.seat]> seater:!
+        - flag <[player].flag[blockout.game.survivor.generator.entity]> generator.workers:--
         - mount <[player]> cancel
         - actionbar " "
 
-        - flag <[player]> blockout.generator:!
+        - flag <[player]> blockout.game.survivor.generator:!
         - flag <[player]> blockout.skill_check:!
         - bmmodel entity:<[player]> model:blockout_anims remove
 
@@ -152,7 +168,7 @@ generator_fail:
     type: task
     debug: false
     script:
-        - define generator <player.flag[blockout.generator.entity].if_null[0]>
+        - define generator <player.flag[blockout.game.survivor.generator.entity].if_null[0]>
         - run update_generator_bar def:-<[generator].flag[generator.progress].mul[0.1].round>|<[generator]>
         - wait 2t
         - bmstate entity:<[generator]> model:generator_temp state:fail
@@ -168,26 +184,26 @@ generator_fail:
         - playeffect effect:smoke <[generator].location.above[0.8]> quantity:50
 
 
-summon_generator:
-    type: task
-    debug: false
-    definitions: loc
-    script:
-        - define loc <player.location>
-        - spawn item_display[item=air] <[loc]> save:gen
-        - bmmodel entity:<entry[gen].spawned_entity> model:generator_temp
-        - flag <entry[gen].spawned_entity> generator.progress:0
-        - flag <entry[gen].spawned_entity> generator.workers:0
+# summon_generator:
+#     type: task
+#     debug: false
+#     definitions: loc
+#     script:
+#         - define loc <player.location>
+#         - spawn item_display[item=air] <[loc]> save:gen
+#         - bmmodel entity:<entry[gen].spawned_entity> model:generator_temp
+#         - flag <entry[gen].spawned_entity> generator.progress:0
+#         - flag <entry[gen].spawned_entity> generator.workers:0
 
-        - define spacing 1.5
+#         - define spacing 1.5
 
-        - define loc <[loc].above[0.5]>
-        - spawn item_display[item=air] <[loc].left[<[spacing]>].face[<[loc]>]> save:display
-        - flag <entry[gen].spawned_entity> seats.1.seat:<entry[display].spawned_entity>
-        - spawn item_display[item=air] <[loc].right[<[spacing]>].face[<[loc]>]> save:display
-        - flag <entry[gen].spawned_entity> seats.2.seat:<entry[display].spawned_entity>
-        - spawn item_display[item=air] <[loc].forward_flat[<[spacing]>].face[<[loc]>]> save:display
-        - flag <entry[gen].spawned_entity> seats.3.seat:<entry[display].spawned_entity>
-        - spawn item_display[item=air] <[loc].backward_flat[<[spacing]>].face[<[loc]>]> save:display
-        - flag <entry[gen].spawned_entity> seats.4.seat:<entry[display].spawned_entity>
+#         - define loc <[loc].above[0.5]>
+#         - spawn item_display[item=air] <[loc].left[<[spacing]>].face[<[loc]>]> save:display
+#         - flag <entry[gen].spawned_entity> seats.1.seat:<entry[display].spawned_entity>
+#         - spawn item_display[item=air] <[loc].right[<[spacing]>].face[<[loc]>]> save:display
+#         - flag <entry[gen].spawned_entity> seats.2.seat:<entry[display].spawned_entity>
+#         - spawn item_display[item=air] <[loc].forward_flat[<[spacing]>].face[<[loc]>]> save:display
+#         - flag <entry[gen].spawned_entity> seats.3.seat:<entry[display].spawned_entity>
+#         - spawn item_display[item=air] <[loc].backward_flat[<[spacing]>].face[<[loc]>]> save:display
+#         - flag <entry[gen].spawned_entity> seats.4.seat:<entry[display].spawned_entity>
 

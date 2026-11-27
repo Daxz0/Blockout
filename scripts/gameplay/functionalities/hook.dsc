@@ -1,12 +1,12 @@
-summon_hook:
-    type: task
-    debug: false
-    definitions: loc
-    script:
-        - define loc <player.location>
-        - spawn item_display[item=air] <[loc]> save:hook
-        - flag <entry[hook].spawned_entity> hook
-        - bmmodel entity:<entry[hook].spawned_entity> model:hook
+# summon_hook:
+#     type: task
+#     debug: false
+#     definitions: loc
+#     script:
+#         - define loc <player.location>
+#         - spawn item_display[item=air] <[loc]> save:hook
+#         - flag <entry[hook].spawned_entity> hook
+#         - bmmodel entity:<entry[hook].spawned_entity> model:hook
 
 hook_handler:
     type: world
@@ -28,7 +28,9 @@ hook_handler:
             - mount <[survivor]> cancel
             - mount <[survivor]>|<context.entity>
             - cast invisibility d:120 no_icon hide_particles <[survivor]>
-            - glow <[survivor]> for:<server.players_flagged[blockout.team.survivor]> true
+            # - glow <[survivor]> for:<server.players_flagged[blockout.team.survivor]> true
+            - fakespawn item_display[item=snowball;glowing=true;glow_color=red;visible=false] <context.entity.location.above[0.5]> players:<server.players_flagged[blockout.team.survivor]> duration:99999 save:hb
+            - playsound sound:block.end_portal.spawn <context.entity.location> volume:4
 
             - flag <context.entity> hooked:<[survivor]> expire:120s
 
@@ -36,19 +38,22 @@ hook_handler:
                 - flag <[survivor]> blockout.game.survivor.hook_count:+:1
                 - wait 1s
                 - if <[survivor].flag[blockout.game.survivor.hook_count]> >= 100:
+                    - playsound sound:block.end_portal.spawn <context.entity.location> volume:4
                     - bmstate entity:<context.entity> model:hook state:activate remove
                     - wait 2t
                     - bmstate entity:<context.entity> model:hook state:death loop:hold
                     - adjust <[survivor]> gamemode:spectator
+                    - announce "<&4><[survivor].name> has died." to_flagged:blockout.team
+                    - flag <player> blockout.game:!
                     - while stop
 
             - cast invisibility remove <[survivor]>
             - mount <[survivor]> cancel
             - bmstate entity:<context.entity> model:hook state:activate loop:once
             - bmstate entity:<context.entity> model:hook state:activate remove
-            - flag <[survivor]> blockout.game.survivor.hits:!
-
-            - glow <[survivor]> for:<server.players_flagged[blockout.team.survivor]> false
+            - flag <[survivor]> blockout.game.survivor.hits:1
+            - fakespawn <entry[hb].faked_entity> cancel  players:<server.players_flagged[blockout.team.survivor]>
+            # - glow <[survivor]> for:<server.players_flagged[blockout.team.survivor]> false
 
         on player input flagged:blockout.game.survivor.hooked:
             - determine passively cancelled

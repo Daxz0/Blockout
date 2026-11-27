@@ -3,10 +3,34 @@ killer_danger_radius:
     debug: false
     definitions: killer|radius
     script:
-        - define loc <[killer].location>
-        - foreach <[loc].find_players_within[<[radius]>].filter[has_flag[blockout.team.survivor]].filter[has_flag[blockout.heartbeat_active].not]> as:player:
-            - run heartbeat_handler def:<[player]>|<[killer]>|<[radius]>
+        - foreach <[killer].location.find_players_within[<[radius]>].filter[has_flag[blockout.team.survivor]]> as:player:
+            - if !<[player].has_flag[blockout.heartbeat_active]>:
+                - run heartbeat_handler def:<[player]>|<[killer]>|<[radius]>
+            - if <[killer].eye_location.line_of_sight[<[player].eye_location>]> && <[killer].location.facing[<[player].location>].degrees[60]>:
+                - run chase_refresh def:<[killer]>|killer
+                - run chase_refresh def:<[player]>|survivor
 
+chase_refresh:
+    type: task
+    debug: false
+    definitions: target|role
+    script:
+        - flag <[target]> blockout.game.<[role]>.chase_seen expire:4s
+        - if !<[target].has_flag[blockout.game.<[role]>.chase]>:
+            - playsound <[target]> sound:blockout.chase custom volume:0.25
+            - flag <[target]> blockout.game.<[role]>.chase expire:10m
+            - run chase_watch def:<[target]>|<[role]>
+
+chase_watch:
+    type: task
+    debug: false
+    definitions: target|role
+    script:
+        - while <[target].is_online> && <[target].has_flag[blockout.game.<[role]>.chase_seen]>:
+            - wait 1s
+        - flag <[target]> blockout.game.<[role]>.chase:!
+        - if <[target].is_online>:
+            - adjust <[target]> stop_sound:blockout.chase
 heartbeat_handler:
     type: task
     debug: false
@@ -23,6 +47,8 @@ heartbeat_handler:
         - while <[dist]> < <[radius]> && <[player].is_online> && <[killer].is_online>:
             - define loc <[killer].location>
             - define dist <[player].location.distance[<[loc]>]>
+            - if <[heart].is_spawned.not> || <[heart].exists.not>:
+                - while stop
 
             - if <[dist]> > <[radius].mul[0.75]>:
                 - adjust <[heart]> glow_color:gray
@@ -45,8 +71,10 @@ heartbeat_handler:
             - wait <[interval].mul[0.6]>s
             - adjust <[heart]> scale:0.15,0.3,0.15
 
-        - adjust <[player]> hide_entity:<[heart]>
         - flag <[player]> blockout.heartbeat_active:!
+        - if <[heart].is_spawned.not> || <[heart].exists.not>:
+            - stop
+        - adjust <[player]> hide_entity:<[heart]>
 
 
 
@@ -75,9 +103,6 @@ swing_runner:
             - flag <player> blockout.game.killer.swing_cd expire:<[data.stats.swing_speed].mul[-0.15].add[3.5]>s
             - run survivor_hit def:<[target].first>
             - playsound sound:entity.zombie.break_wooden_door <[target].first.location> volume:5
-            - stop if:<[target].flag[blockout.game.survivor.hits].is_more_than_or_equal_to[2]>
-                - cast speed amplifier:2 duration:4s <[target].first> no_icon hide_particles
-
 
 
 
@@ -87,7 +112,7 @@ update_wiggle_bar:
     definitions: amount|killer|survivor
     script:
         - flag <[survivor]> blockout.game.survivor.wiggle:+:<[amount]>
-        - if <[survivor].flag[blockout.game.survivor.wiggle]> >= 105:
+        - if <[survivor].flag[blockout.game.survivor.wiggle]> >= 103:
             - remove <[survivor].flag[blockout.game.survivor.pickup]>
             - flag <[survivor]> blockout.game.survivor.pickup:!
             - flag <[survivor]> blockout.game.survivor.wiggle:!
@@ -129,12 +154,13 @@ pickup_handler:
             - flag <[entity]> blockout.game.killer.pickup:<[player]>
             - bmstate entity:<[entity]> model:<[entity].bm_entity.model.name> state:walk_pickup loop:loop
             - mount <[player]>|<entry[holder].spawned_entity>|<[entity]>
-
+            - run blockout_glow def:hooks|true|<player>
         - while <[entity].has_flag[blockout.game.killer.pickup]> && <[player].is_online> && <[entity].is_online>:
             - cast invisibility d:5t no_icon hide_particles <[player]>
             - wait 5t
             - run update_wiggle_bar def:1|<[entity]>|<[player]>
 
+        - run blockout_glow def:hooks|false|<player>
         - flag <[player]> blockout.game.survivor.pickup:!
 
 
@@ -142,7 +168,7 @@ killer_handler:
     type: world
     debug: false
     events:
-        on player right clicks block location_flagged:pickup:
+        on player right clicks block location_flagged:pickup flagged:blockout.team.killer:
             - ratelimit <player> 10t
             - stop if:<player.has_flag[blockout.game.killer.pickup]>
             - define player <context.location.flag[pickup]>
@@ -164,6 +190,7 @@ killer_handler:
             - ratelimit <player> 10t
             - inject swing_runner
         on player damages player:
+            - ratelimit <player> 10t
             - if <context.damager.has_flag[blockout.team.killer]>:
                 - inject swing_runner
             - determine passively cancelled
